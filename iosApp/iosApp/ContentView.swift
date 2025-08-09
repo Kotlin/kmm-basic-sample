@@ -19,15 +19,29 @@ struct ContentView: View {
         VStack(alignment: .center) {
             Text(greet)
             HStack(alignment: .center) {
-                TextField("A", text: $firstNum)
-                    .keyboardType(.numberPad)
-                    .multilineTextAlignment(.center)
-                    .frame(width: 30)
+                if #available(iOS 16.0, *) {
+                    TextField("A", text: $firstNum, axis: .vertical)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.center)
+                        .frame(width: 30)
+                } else {
+                    TextEditor(text: $firstNum)
+                        .keyboardType(.numberPad)
+                        .frame(minWidth: 30)
+                        .fixedSize(horizontal: true, vertical: true)
+                }
                 Text("+")
-                TextField("B", text: $secondNum)
-                    .keyboardType(.numberPad)
-                    .multilineTextAlignment(.center)
-                    .frame(width: 30)
+                if #available(iOS 16.0, *) {
+                    TextField("B", text: $secondNum, axis: .vertical)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.center)
+                        .frame(width: 30)
+                } else {
+                    TextEditor(text: $secondNum)
+                        .keyboardType(.numberPad)
+                        .frame(minWidth: 30)
+                        .fixedSize(horizontal: true, vertical: true)
+                }
                 Text("=")
                 Text(sum)
             }
