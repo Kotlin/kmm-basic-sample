@@ -5,8 +5,8 @@ struct ContentView: View {
     let calculator = Calculator.Companion()
     let greet = Greeting().greeting()
     
-    @State private var firstNum: String = "0"
-    @State private var secondNum: String = "0"
+    @State private var firstNum: String = ""
+    @State private var secondNum: String = ""
     private var sum: String {
         if let firstNum = Int32(firstNum), let secondNum = Int32(secondNum) {
             return String(calculator.sum(a: firstNum, b: secondNum))
@@ -22,12 +22,12 @@ struct ContentView: View {
                 TextField("A", text: $firstNum)
                     .keyboardType(.numberPad)
                     .multilineTextAlignment(.center)
-                    .frame(width: 30)
+                    .frame(width: 100)
                 Text("+")
                 TextField("B", text: $secondNum)
                     .keyboardType(.numberPad)
                     .multilineTextAlignment(.center)
-                    .frame(width: 30)
+                    .frame(width: 100)
                 Text("=")
                 Text(sum)
             }
