@@ -1,0 +1,80 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4096M -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true"
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Gradle setup
+        uses: ./.github/actions/gradle-setup
+
+      - name: Run unit tests
+        run: ./gradlew :shared:allTests
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: "**/build/reports/tests/"
+
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Gradle setup
+        uses: ./.github/actions/gradle-setup
+
+      - name: Build Android debug APK
+        run: ./gradlew :androidApp:assembleDebug
+
+      - name: Upload Android debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: androidApp/build/outputs/apk/debug/*.apk
+
+
+  build-ios:
+    name: Build iOS simulator app
+    runs-on: macos-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Gradle setup
+        uses: ./.github/actions/gradle-setup
+
+      - name: Build iOS simulator app
+        run: |
+          xcodebuild build \
+          -project iosApp/iosApp.xcodeproj \
+          -configuration Debug \
+          -scheme iosApp \
+          -sdk iphonesimulator \
+          -arch arm64 \
+          -derivedDataPath ./build \
+          -verbose
+
+      - name: Upload App Folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: iphonesimulator-app
+          path: build/Build/Products/Debug-iphonesimulator/*
